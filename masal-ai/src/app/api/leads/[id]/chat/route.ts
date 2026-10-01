@@ -93,14 +93,22 @@ export async function POST(req: Request, { params }: Ctx) {
     if (historyError) throw historyError;
     const history = ((recent ?? []) as LeadMessage[]).reverse();
 
-    // Save the user message immediately, so it is never lost even if the AI fails.
-    const { error: insertError } = await supabase
-      .from("lead_messages")
-      .insert({ lead_id: id, role: "user", content: text });
-    if (insertError) throw insertError;
+    // Retry case: the last saved message is this same user message with no reply yet
+    // (the previous attempt failed). Reuse it instead of saving a duplicate.
+    const last = history[history.length - 1];
+    const isRetry = last?.role === "user" && last.content === text;
 
+    if (!isRetry) {
+      // Save the user message immediately, so it is never lost even if the AI fails.
+      const { error: insertError } = await supabase
+        .from("lead_messages")
+        .insert({ lead_id: id, role: "user", content: text });
+      if (insertError) throw insertError;
+    }
+
+    const priorHistory = isRetry ? history.slice(0, -1) : history;
     const messages: ModelMessage[] = [
-      ...history.map((m) => ({ role: m.role, content: m.content }) as ModelMessage),
+      ...priorHistory.map((m) => ({ role: m.role, content: m.content }) as ModelMessage),
       { role: "user", content: text },
     ];
 

@@ -1,7 +1,7 @@
-# LeadLens - Contracts and Rules (single source of truth)
+# Masal AI - Contracts and Rules (single source of truth)
 
 ## 1. Product
-A salesperson enters inbound real-estate leads. AI analyses each lead, scores it (hot / warm / cold), ranks the list, and answers follow-up questions grounded in that one lead.
+Masal AI (product name; set in src/lib/brand.ts). A salesperson enters inbound real-estate leads. AI analyses each lead, scores it (hot / warm / cold), ranks the list, and answers follow-up questions grounded in that one lead.
 
 ## 2. Stack (fixed - do not substitute)
 Next.js App Router + TypeScript (strict) | Tailwind CSS + shadcn/ui | Supabase Postgres + Realtime | Vercel AI SDK (ai) + Zod | Gemini Flash primary, Groq fallback | Vercel Hobby hosting | VS Code.
@@ -110,5 +110,6 @@ src/hooks/use-leads.ts              fetch + Realtime subscription
 src/lib/ai/{schemas,prompts,providers,analyze}.ts
 src/lib/supabase/{server,browser}.ts
 src/lib/types.ts
+src/lib/brand.ts                    APP_NAME shown in the UI
 supabase/schema.sql
 docs/{CONTRACTS,PROJECT_STATE}.md

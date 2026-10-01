@@ -1,4 +1,4 @@
-# LeadLens - Project State
+# Masal AI - Project State
 
 ## 1. Status
 | Step | Description | Status |
@@ -6,7 +6,7 @@
 | 1.1 | Contracts, database and AI layer | Done |
 | 1.2 | API routes | Done |
 | 2.1 | Dashboard, intake form, ranked list | Done |
-| 2.2 | Lead detail: AI brief + grounded chat | Not started |
+| 2.2 | Lead detail: AI brief + grounded chat | Done |
 | 3.1 | Sample data, error states, polish | Not started |
 | 4.1 | Pre-deploy audit + Vercel deploy | Not started |
 | 5.1 | Property Match & Cross-Sell Matrix | Not started |
@@ -43,6 +43,13 @@
 | src/components/stats-bar.tsx | Hot / Warm / Cold / Urgent counts that act as toggle filters (aria-pressed) |
 | src/components/tier-badge.tsx | TIER_META colours + labels, TierBadge, UrgentFlag |
 | src/components/score-ring.tsx | SVG score ring in the tier colour; dashed ring when not scored |
+| src/lib/brand.ts | APP_NAME ("Masal AI") and tagline, used by the header and page titles |
+| src/app/leads/[id]/page.tsx | Server component: loads lead + chat history, 404 if missing, passes enableDelete |
+| src/components/lead-detail.tsx | Detail layout: brief 60% + sticky chat 40% on desktop, Brief/Coach tabs on mobile; Realtime updates for this lead |
+| src/components/analysis-brief.tsx | Brief in scan order: header, next action, summary + intent, requirements vs concerns, score breakdown, suggested reply, original inquiry; Re-analyse and Delete (confirm dialog) |
+| src/components/score-breakdown.tsx | Four sub-score bars (x/25) + score reason |
+| src/components/chat-panel.tsx | useChat + DefaultChatTransport (sends only the newest message), quick prompts, streaming, auto-scroll, Stop, Copy, error + Retry, light Markdown rendering |
+| src/components/copy-button.tsx | Clipboard copy with a 2 s tick |
 
 ## 3. Decisions
 - Installed versions checked (rule R5): ai 7.x, @ai-sdk/google 4.x, @ai-sdk/groq 4.x, zod 4.x, @supabase/supabase-js 2.x. In ai 7, generateObject is deprecated, so analysis uses generateText with output: Output.object({ schema }) and reads result.output. System prompts use `instructions` (the `system` option is deprecated).
@@ -63,9 +70,13 @@
 - The header's New lead button lives in the server layout, so the dialog announces a new lead with a window event (LEAD_CREATED_EVENT) instead of shared state; the dashboard listens, upserts and highlights it.
 - Timeline uses a native <select> (works well on phones and avoids depending on the shadcn Select API).
 - Cards use a stretched link so the whole card opens the lead while the Retry button stays clickable.
+- Product renamed to Masal AI via src/lib/brand.ts (one constant).
+- Chat client sends only the newest message (prepareSendMessagesRequest); history comes from the database. Retrying a failed reply does not save the question twice: the chat route reuses the last saved user message if it is identical and has no reply.
+- Assistant replies are rendered with a tiny built-in formatter (paragraphs, lists, bold) instead of a Markdown library (rule R1) and without injecting HTML.
+- Mobile tabs and the collapsible inquiry use plain buttons and <details> instead of shadcn Tabs/Accordion, to avoid depending on their APIs.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: Prompt 2.2 - Lead detail: AI brief + grounded chat
+NEXT: Prompt 3.1 - Sample data, error states, polish

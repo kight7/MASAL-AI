@@ -5,7 +5,7 @@ import { getBrowserSupabase } from "@/lib/supabase/browser";
 import type { Lead } from "@/lib/types";
 
 /** Fired by the intake dialog after a lead is created, so the dashboard shows it at once. */
-export const LEAD_CREATED_EVENT = "leadlens:lead-created";
+export const LEAD_CREATED_EVENT = "masal:lead-created";
 
 function isNewer(incoming: Lead, current: Lead): boolean {
   return Date.parse(incoming.updated_at) >= Date.parse(current.updated_at);

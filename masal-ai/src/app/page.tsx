@@ -36,7 +36,8 @@ export default function DashboardPage() {
   }, [highlightId]);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
+      <div className="max-w-4xl">
       <div className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight text-[#14213D]">Your leads</h1>
         <p className="mt-1 text-sm text-[#5B6B80]">Ranked by AI score, hottest first. Open a lead for the full brief and a coach.</p>
@@ -73,6 +74,7 @@ export default function DashboardPage() {
           <LeadList leads={leads} filter={filter} highlightId={highlightId} onUpdated={addLead} />
         </div>
       )}
+      </div>
     </div>
   );
 }
