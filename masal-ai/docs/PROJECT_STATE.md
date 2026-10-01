@@ -8,7 +8,7 @@
 | 2.1 | Dashboard, intake form, ranked list | Done |
 | 2.2 | Lead detail: AI brief + grounded chat | Done |
 | 3.1 | Sample data, error states, polish | Done |
-| 4.1 | Pre-deploy audit + Vercel deploy | Not started |
+| 4.1 | Pre-deploy audit + Vercel deploy | Partial (audit done; deploy is manual) |
 | 5.1 | Property Match & Cross-Sell Matrix | Not started |
 | 5.2 | Call Prep Notes | Not started |
 | 6.1 | README, demo script, interview prep | Not started |
@@ -54,6 +54,7 @@
 | src/app/api/leads/seed/route.ts | POST: inserts the 6 sample leads as pending + queued, no AI call; 429 under the hourly cap |
 | src/components/sample-leads-button.tsx | Load sample leads: seed, then analyse one by one with progress toast; retry once after 5 s on 429/provider failure; skip on 409 |
 | src/app/loading.tsx, error.tsx, not-found.tsx | Skeleton while loading; friendly error page with Try again; "Lead not found" page |
+| docs/DEPLOY.md | Click-by-click Vercel deploy (Root Directory = masal-ai), env var table, smoke test, troubleshooting |
 
 ## 3. Decisions
 - Installed versions checked (rule R5): ai 7.x, @ai-sdk/google 4.x, @ai-sdk/groq 4.x, zod 4.x, @supabase/supabase-js 2.x. In ai 7, generateObject is deprecated, so analysis uses generateText with output: Output.object({ schema }) and reads result.output. System prompts use `instructions` (the `system` option is deprecated).
@@ -79,10 +80,12 @@
 - Assistant replies are rendered with a tiny built-in formatter (paragraphs, lists, bold) instead of a Markdown library (rule R1) and without injecting HTML.
 - Mobile tabs and the collapsible inquiry use plain buttons and <details> instead of shadcn Tabs/Accordion, to avoid depending on their APIs.
 - Sample leads are analysed from the browser one at a time (1.2 s gap) instead of in the seed route: no request can hit the 60 s limit and free-tier rate limits are respected. They are marked "queued" (error = "queued") so the re-analyse guard can claim each exactly once.
+- Pre-deploy audit (4.1): `next build` passes (9 routes; dashboard static, everything else dynamic); ESLint (eslint-config-next 16) clean; no "use client" file imports server modules; no secret names in .next/static; only NEXT_PUBLIC_SUPABASE_URL/ANON_KEY are public; every AI route exports maxDuration = 60; contact never reaches prompts; RLS + public SELECT on leads only; leads in supabase_realtime; FORCE_FALLBACK documented.
+- Lint fix: the dashboard's first load now sets state only inside a promise callback (react-hooks/set-state-in-effect).
 - Accessibility pass: 40 px tap targets on mobile for icon and small buttons, visible focus rings, aria-labels on icon-only buttons, reduced-motion aware scrolling.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: Prompt 4.1 - Pre-deploy audit, then deploy to Vercel
+NEXT: deploy manually (docs/DEPLOY.md), run the smoke test, then Prompt 5.1

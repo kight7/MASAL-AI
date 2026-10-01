@@ -47,25 +47,37 @@ export function useLeads() {
     setLeads((prev) => prev.filter((l) => l.id !== id));
   }, []);
 
-  const refresh = useCallback(async () => {
+  /** Fetch only (no state changes), so it can run from an effect and from event handlers. */
+  const fetchLeads = useCallback(async (): Promise<{ leads: Lead[] } | { error: string }> => {
     try {
       const res = await fetch("/api/leads", { cache: "no-store" });
       const body = await res.json();
-      if (!res.ok) throw new Error(body?.error ?? "Could not load leads");
-      if (mounted.current) {
-        setLeads(body as Lead[]);
-        setError(null);
-      }
+      if (!res.ok) return { error: body?.error ?? "Could not load leads" };
+      return { leads: body as Lead[] };
     } catch (err) {
-      if (mounted.current) setError(err instanceof Error ? err.message : "Could not load leads");
-    } finally {
-      if (mounted.current) setLoading(false);
+      return { error: err instanceof Error ? err.message : "Could not load leads" };
     }
   }, []);
 
+  const applyResult = useCallback((result: { leads: Lead[] } | { error: string }) => {
+    if (!mounted.current) return;
+    if ("leads" in result) {
+      setLeads(result.leads);
+      setError(null);
+    } else {
+      setError(result.error);
+    }
+    setLoading(false);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    applyResult(await fetchLeads());
+  }, [fetchLeads, applyResult]);
+
   useEffect(() => {
     mounted.current = true;
-    void refresh();
+    // Initial load: state is only set in the promise callback, never synchronously in the effect.
+    fetchLeads().then(applyResult);
 
     // Live updates. If Realtime is not configured, the app still works with manual refresh.
     let cleanupRealtime = () => {};
@@ -95,7 +107,7 @@ export function useLeads() {
 
     // Catch up after the tab was in the background (Realtime can miss events while asleep).
     const onVisible = () => {
-      if (document.visibilityState === "visible") void refresh();
+      if (document.visibilityState === "visible") fetchLeads().then(applyResult);
     };
     document.addEventListener("visibilitychange", onVisible);
 
@@ -106,7 +118,7 @@ export function useLeads() {
       window.removeEventListener(LEAD_UPDATED_EVENT, onCreated);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [refresh, upsert, remove]);
+  }, [fetchLeads, applyResult, upsert, remove]);
 
   return { leads, loading, error, refresh, addLead: upsert };
 }
