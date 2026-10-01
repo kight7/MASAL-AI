@@ -5,6 +5,7 @@ import { Inbox, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NewLeadButton } from "@/components/intake-dialog";
+import { SampleLeadsButton } from "@/components/sample-leads-button";
 import { LeadList } from "@/components/lead-list";
 import { StatsBar, type LeadFilter } from "@/components/stats-bar";
 import { LEAD_CREATED_EVENT, useLeads } from "@/hooks/use-leads";
@@ -21,8 +22,11 @@ export default function DashboardPage() {
       const lead = (e as CustomEvent<Lead>).detail;
       setFilter("all");
       setHighlightId(lead.id);
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       requestAnimationFrame(() =>
-        document.getElementById(`lead-${lead.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
+        document
+          .getElementById(`lead-${lead.id}`)
+          ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" })
       );
     };
     window.addEventListener(LEAD_CREATED_EVENT, onCreated);
@@ -64,9 +68,11 @@ export default function DashboardPage() {
           <p className="mt-3 max-w-sm text-sm text-[#2D3B4E]">
             No leads yet. Add an inquiry and the AI will score it, rank it and suggest what to do next.
           </p>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
             <NewLeadButton />
+            <SampleLeadsButton />
           </div>
+          <p className="mt-3 text-xs text-[#8A96A6]">Sample leads are fictional and take about 30 seconds to analyse.</p>
         </div>
       ) : (
         <div className="space-y-6">

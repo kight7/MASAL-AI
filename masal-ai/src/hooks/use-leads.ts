@@ -4,8 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
 import type { Lead } from "@/lib/types";
 
-/** Fired by the intake dialog after a lead is created, so the dashboard shows it at once. */
+/** Fired by the intake dialog after a lead is created, so the dashboard shows and highlights it. */
 export const LEAD_CREATED_EVENT = "masal:lead-created";
+
+/** Fired when a lead changed somewhere else in the app (e.g. sample-lead analysis). Upsert only, no highlight. */
+export const LEAD_UPDATED_EVENT = "masal:lead-updated";
+
+export function announceLead(lead: Lead, event: typeof LEAD_CREATED_EVENT | typeof LEAD_UPDATED_EVENT) {
+  window.dispatchEvent(new CustomEvent<Lead>(event, { detail: lead }));
+}
 
 function isNewer(incoming: Lead, current: Lead): boolean {
   return Date.parse(incoming.updated_at) >= Date.parse(current.updated_at);
@@ -84,6 +91,7 @@ export function useLeads() {
 
     const onCreated = (e: Event) => upsert((e as CustomEvent<Lead>).detail);
     window.addEventListener(LEAD_CREATED_EVENT, onCreated);
+    window.addEventListener(LEAD_UPDATED_EVENT, onCreated);
 
     // Catch up after the tab was in the background (Realtime can miss events while asleep).
     const onVisible = () => {
@@ -95,6 +103,7 @@ export function useLeads() {
       mounted.current = false;
       cleanupRealtime();
       window.removeEventListener(LEAD_CREATED_EVENT, onCreated);
+      window.removeEventListener(LEAD_UPDATED_EVENT, onCreated);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [refresh, upsert, remove]);

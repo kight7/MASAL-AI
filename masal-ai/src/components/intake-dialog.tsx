@@ -55,7 +55,11 @@ export function NewLeadButton({ size = "default" }: { size?: "default" | "sm" })
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button size={size} onClick={() => setOpen(true)} className="bg-[#14213D] text-white hover:bg-[#1F3157]">
+      <Button
+        size={size}
+        onClick={() => setOpen(true)}
+        className={`bg-[#14213D] text-white hover:bg-[#1F3157] ${size === "sm" ? "h-10 sm:h-8" : "h-10"}`}
+      >
         <Plus className="size-4" aria-hidden />
         New lead
       </Button>
@@ -111,7 +115,7 @@ export function IntakeDialog({ open, onOpenChange }: { open: boolean; onOpenChan
       const lead = body as Lead;
       window.dispatchEvent(new CustomEvent<Lead>(LEAD_CREATED_EVENT, { detail: lead }));
       if (lead.status === "failed") {
-        toast.warning(`${lead.name} saved, but the AI analysis failed. Use Retry on the card.`);
+        toast.warning(`Both AI providers are busy. ${lead.name} is saved, retry in a minute from the card.`);
       } else {
         toast.success(`${lead.name} added as a ${lead.tier} lead (score ${lead.score}).`);
       }

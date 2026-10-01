@@ -42,6 +42,9 @@ POST {{base}}/leads/{{leadId}}/reanalyze
 ### 7. Delete. Returns 403 unless ENABLE_DELETE=true in .env.local.
 DELETE {{base}}/leads/{{leadId}}
 
+### 8a. Add the 6 sample leads (returns them as pending + queued; the dashboard button also analyses them)
+POST {{base}}/leads/seed
+
 ### --- Error cases ---
 
 ### 8. Validation error -> 400 with fieldErrors

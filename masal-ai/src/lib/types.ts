@@ -38,6 +38,17 @@ export interface LeadMessage {
 export const STALE_PENDING_MS = 90_000;
 
 /**
+ * Sample leads are inserted as status "pending" with error = QUEUED_MARKER: waiting for the
+ * client to analyse them one by one. Re-analyse may claim a queued lead exactly once
+ * (claiming clears the marker), so the double-run guard still holds.
+ */
+export const QUEUED_MARKER = "queued";
+
+export function isQueued(lead: Pick<Lead, "status" | "error">): boolean {
+  return lead.status === "pending" && lead.error === QUEUED_MARKER;
+}
+
+/**
  * True when a lead has been "pending" for more than 90 seconds, for example because
  * the browser tab closed mid-analysis. The UI offers Retry on these (contract section 7).
  */

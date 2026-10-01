@@ -66,7 +66,7 @@ export function AnalysisBrief({
       else if (!res.ok) toast.error(body?.error ?? "Re-analysis failed. Please try again.");
       else {
         onLeadChange(body as Lead);
-        if ((body as Lead).status === "failed") toast.error("Both AI providers are busy. Try again in a minute.");
+        if ((body as Lead).status === "failed") toast.error("Both AI providers are busy. Your lead is saved, retry in a minute.");
         else toast.success("Analysis updated.");
       }
     } catch {
@@ -141,7 +141,7 @@ export function AnalysisBrief({
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={reanalyze} disabled={busy}>
+          <Button variant="outline" size="sm" onClick={reanalyze} disabled={busy} className="h-10 sm:h-8">
             {busy ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden /> : <RotateCw className="size-3.5" aria-hidden />}
             {busy ? "Analysing…" : "Re-analyse"}
           </Button>
@@ -150,7 +150,7 @@ export function AnalysisBrief({
               variant="outline"
               size="sm"
               onClick={() => setConfirmDelete(true)}
-              className="text-[#C8233C] hover:text-[#9A1A2E]"
+              className="h-10 text-[#C8233C] hover:text-[#9A1A2E] sm:h-8"
             >
               <Trash2 className="size-3.5" aria-hidden />
               Delete
@@ -176,9 +176,11 @@ export function AnalysisBrief({
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[#C8233C]" aria-hidden />
           <div>
             <p className="font-medium text-[#14213D]">
-              {lead.status === "failed" ? "The AI analysis failed. The lead is saved." : "The analysis stopped before finishing."}
+              {lead.status === "failed"
+                ? "Both AI providers were busy. The lead is saved."
+                : "The analysis stopped before finishing."}
             </p>
-            <p className="mt-1 text-[#5B6B80]">Use Re-analyse to try again. The chat still works with the lead details.</p>
+            <p className="mt-1 text-[#5B6B80]">Use Re-analyse in a minute. The coach chat still works with the lead details.</p>
           </div>
         </div>
       )}

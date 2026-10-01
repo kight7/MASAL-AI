@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IBM_Plex_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { NewLeadButton } from "@/components/intake-dialog";
+import { SampleLeadsButton } from "@/components/sample-leads-button";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import "./globals.css";
 
@@ -38,7 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </svg>
               {APP_NAME}
             </Link>
-            <NewLeadButton size="sm" />
+            <div className="flex items-center gap-2">
+              <SampleLeadsButton compact />
+              <NewLeadButton size="sm" />
+            </div>
           </div>
         </header>
         <main>{children}</main>

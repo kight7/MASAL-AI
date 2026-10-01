@@ -39,7 +39,7 @@ export function CopyButton({
       type="button"
       onClick={copy}
       aria-label={copied ? "Copied" : label}
-      className={`inline-flex min-h-8 items-center gap-1.5 rounded-md border border-[#D5DDE6] bg-white px-2.5 text-xs font-medium text-[#14213D] outline-none transition-colors hover:bg-[#F3F5F8] focus-visible:ring-2 focus-visible:ring-[#14213D] ${className}`}
+      className={`inline-flex min-h-10 items-center sm:min-h-8 gap-1.5 rounded-md border border-[#D5DDE6] bg-white px-2.5 text-xs font-medium text-[#14213D] outline-none transition-colors hover:bg-[#F3F5F8] focus-visible:ring-2 focus-visible:ring-[#14213D] ${className}`}
     >
       <Icon className={`size-3.5 ${copied ? "text-[#1F7A4D]" : ""}`} aria-hidden />
       {showLabel && (copied ? "Copied" : label)}

@@ -4,7 +4,7 @@ import { analyzeLead } from "@/lib/ai/analyze";
 import { AIUnavailableError } from "@/lib/ai/providers";
 import type { LeadInput } from "@/lib/ai/schemas";
 import { getServerSupabase } from "@/lib/supabase/server";
-import { STALE_PENDING_MS, type Lead } from "@/lib/types";
+import { QUEUED_MARKER, STALE_PENDING_MS, type Lead } from "@/lib/types";
 
 /*
  * Shared helpers for the API routes (contract section 8). Server only.
@@ -141,8 +141,9 @@ export async function analyzeAndSave(lead: Lead): Promise<Lead> {
 
 /**
  * Atomically moves a lead to "pending" unless it is already being analysed.
- * Returns the claimed row, or null if the lead is pending and not yet stale (caller returns 409).
- * The condition is part of the UPDATE, so two simultaneous clicks cannot both start an analysis.
+ * Claimable: not pending, OR pending but stale (> 90 s), OR queued (sample lead not started yet).
+ * Returns the claimed row, or null otherwise (caller returns 409). The condition is part of the
+ * UPDATE and claiming clears the queued marker, so two requests can never both start an analysis.
  */
 export async function claimForReanalysis(id: string): Promise<Lead | null> {
   const staleBefore = new Date(Date.now() - STALE_PENDING_MS).toISOString();
@@ -150,7 +151,7 @@ export async function claimForReanalysis(id: string): Promise<Lead | null> {
     .from("leads")
     .update({ status: "pending", error: null, updated_at: nowIso() })
     .eq("id", id)
-    .or(`status.neq.pending,updated_at.lt."${staleBefore}"`)
+    .or(`status.neq.pending,updated_at.lt."${staleBefore}",error.eq.${QUEUED_MARKER}`)
     .select("*");
   if (error) throw error;
   return (data?.[0] as Lead | undefined) ?? null;

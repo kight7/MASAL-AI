@@ -7,7 +7,7 @@
 | 1.2 | API routes | Done |
 | 2.1 | Dashboard, intake form, ranked list | Done |
 | 2.2 | Lead detail: AI brief + grounded chat | Done |
-| 3.1 | Sample data, error states, polish | Not started |
+| 3.1 | Sample data, error states, polish | Done |
 | 4.1 | Pre-deploy audit + Vercel deploy | Not started |
 | 5.1 | Property Match & Cross-Sell Matrix | Not started |
 | 5.2 | Call Prep Notes | Not started |
@@ -50,6 +50,10 @@
 | src/components/score-breakdown.tsx | Four sub-score bars (x/25) + score reason |
 | src/components/chat-panel.tsx | useChat + DefaultChatTransport (sends only the newest message), quick prompts, streaming, auto-scroll, Stop, Copy, error + Retry, light Markdown rendering |
 | src/components/copy-button.tsx | Clipboard copy with a 2 s tick |
+| src/lib/sample-leads.ts | 6 fictional Delhi NCR leads: hot+urgent, warm comparing areas, cold browsing, price objection, Hinglish, almost empty |
+| src/app/api/leads/seed/route.ts | POST: inserts the 6 sample leads as pending + queued, no AI call; 429 under the hourly cap |
+| src/components/sample-leads-button.tsx | Load sample leads: seed, then analyse one by one with progress toast; retry once after 5 s on 429/provider failure; skip on 409 |
+| src/app/loading.tsx, error.tsx, not-found.tsx | Skeleton while loading; friendly error page with Try again; "Lead not found" page |
 
 ## 3. Decisions
 - Installed versions checked (rule R5): ai 7.x, @ai-sdk/google 4.x, @ai-sdk/groq 4.x, zod 4.x, @supabase/supabase-js 2.x. In ai 7, generateObject is deprecated, so analysis uses generateText with output: Output.object({ schema }) and reads result.output. System prompts use `instructions` (the `system` option is deprecated).
@@ -74,9 +78,11 @@
 - Chat client sends only the newest message (prepareSendMessagesRequest); history comes from the database. Retrying a failed reply does not save the question twice: the chat route reuses the last saved user message if it is identical and has no reply.
 - Assistant replies are rendered with a tiny built-in formatter (paragraphs, lists, bold) instead of a Markdown library (rule R1) and without injecting HTML.
 - Mobile tabs and the collapsible inquiry use plain buttons and <details> instead of shadcn Tabs/Accordion, to avoid depending on their APIs.
+- Sample leads are analysed from the browser one at a time (1.2 s gap) instead of in the seed route: no request can hit the 60 s limit and free-tier rate limits are respected. They are marked "queued" (error = "queued") so the re-analyse guard can claim each exactly once.
+- Accessibility pass: 40 px tap targets on mobile for icon and small buttons, visible focus rings, aria-labels on icon-only buttons, reduced-motion aware scrolling.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: Prompt 3.1 - Sample data, error states, polish
+NEXT: Prompt 4.1 - Pre-deploy audit, then deploy to Vercel

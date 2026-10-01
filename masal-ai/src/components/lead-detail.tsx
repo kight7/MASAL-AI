@@ -48,7 +48,7 @@ export function LeadDetail({
   }, [initialLead.id]);
 
   const tabClass = (t: Tab) =>
-    `flex-1 rounded-md px-3 py-2 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-[#14213D] ${
+    `min-h-10 flex-1 rounded-md px-3 py-2 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-[#14213D] ${
       tab === t ? "bg-white text-[#14213D] shadow-sm" : "text-[#5B6B80]"
     }`;
 

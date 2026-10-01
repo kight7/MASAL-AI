@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LoaderCircle, Mail, MapPin, MessageCircle, Phone, RotateCw, type LucideIcon } from "lucide-react";
+import { Clock, LoaderCircle, Mail, MapPin, MessageCircle, Phone, RotateCw, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreRing } from "@/components/score-ring";
 import { TierBadge, TIER_META, UrgentFlag } from "@/components/tier-badge";
 import { TIMELINE_LABELS, type Channel } from "@/lib/ai/schemas";
-import { isStalePending, type Lead } from "@/lib/types";
+import { isQueued, isStalePending, type Lead } from "@/lib/types";
 
 export const CHANNEL_META: Record<Channel, { label: string; icon: LucideIcon }> = {
   call: { label: "Call", icon: Phone },
@@ -35,7 +35,8 @@ export function LeadCard({
 }) {
   const [retrying, setRetrying] = useState(false);
   const stale = isStalePending(lead, now);
-  const pending = lead.status === "pending" && !stale && !retrying;
+  const queued = isQueued(lead) && !stale && !retrying;
+  const pending = lead.status === "pending" && !stale && !retrying && !queued;
   const needsRetry = !retrying && (lead.status === "failed" || stale);
 
   async function retry() {
@@ -49,7 +50,7 @@ export function LeadCard({
         toast.error(body?.error ?? "Retry failed. Please try again.");
       } else {
         onUpdated(body as Lead);
-        if ((body as Lead).status === "failed") toast.error("Both AI providers are still busy. Try again in a minute.");
+        if ((body as Lead).status === "failed") toast.error("Both AI providers are busy. Your lead is saved, retry in a minute.");
       }
     } catch {
       toast.error("Network error. Check your connection and try again.");
@@ -89,6 +90,13 @@ export function LeadCard({
           {analysis && lead.urgent && <UrgentFlag />}
         </div>
 
+        {queued && (
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-[#5B6B80]" aria-live="polite">
+            <Clock className="size-3.5" aria-hidden />
+            Waiting to be analysed…
+          </p>
+        )}
+
         {(pending || retrying) && (
           <div className="mt-2 space-y-2" aria-live="polite">
             <p className="flex items-center gap-1.5 text-sm text-[#5B6B80]">
@@ -105,13 +113,13 @@ export function LeadCard({
             <p className="text-sm text-[#5B6B80]">
               {stale && lead.status === "pending"
                 ? "Analysis stopped before finishing."
-                : "AI analysis failed. The lead is saved."}
+                : "Both AI providers were busy. The lead is saved."}
             </p>
             <Button
               size="sm"
               variant="outline"
               onClick={retry}
-              className="relative z-10 h-8"
+              className="relative z-10 h-10 sm:h-8"
               aria-label={`Retry analysis for ${lead.name}`}
             >
               <RotateCw className="size-3.5" aria-hidden />

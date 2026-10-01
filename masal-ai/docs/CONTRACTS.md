@@ -78,6 +78,7 @@ AnalysisSchema (Zod):
 score = sum of the four score_breakdown values (0-100), computed IN CODE, never by the model.
 tier: hot >= 70, warm 40-69, cold < 40. API order: score desc nulls last, then created_at desc. Inside each UI tier section: urgent first, then score desc, then created_at desc.
 Stale pending: status "pending" and updated_at older than 90 seconds (for example, the tab closed mid-analysis). The UI offers Retry on stale leads.
+Queued: status "pending" with error = "queued" (sample leads waiting for the client to analyse them). Reanalyze may claim a queued lead once; claiming clears the marker.
 Rubric for ANALYSIS_SYSTEM:
 - You assist a real-estate salesperson. Use ONLY facts in the lead. Never invent prices, listings or promises. Unknown = "not stated".
 - Keep every field scannable: summary <= 2 sentences, bullets <= 12 words.
@@ -95,10 +96,10 @@ POST   /api/leads                 body LeadInput -> 429 if MAX_LEADS_PER_HOUR re
 GET    /api/leads                 -> Lead[] (score desc nulls last, created_at desc)
 GET    /api/leads/[id]            -> Lead
 DELETE /api/leads/[id]            -> { ok: true }; 403 unless ENABLE_DELETE=true
-POST   /api/leads/[id]/reanalyze  -> Lead (status pending -> analyzed | failed); 409 if already pending and not stale. maxDuration 60.
+POST   /api/leads/[id]/reanalyze  -> Lead (status pending -> analyzed | failed); 409 if already pending and not stale or queued. maxDuration 60.
 GET    /api/leads/[id]/messages   -> LeadMessage[] (oldest first)
 POST   /api/leads/[id]/chat       -> streamed reply grounded by buildChatSystem(lead); falls back to Groq if Gemini fails before the first token; persists user + assistant messages; 429 after 30 user messages on one lead. maxDuration 60.
-POST   /api/leads/seed            -> inserts 6 sample leads as status pending (added in Prompt 3.1); 429 if fewer than 6 slots remain under MAX_LEADS_PER_HOUR
+POST   /api/leads/seed            -> inserts 6 sample leads as status pending + queued and returns them (no AI call); the client analyses them one by one via reanalyze; 429 if fewer than 6 slots remain under MAX_LEADS_PER_HOUR
 Errors: JSON { error: string } with status 400 (validation, plus fieldErrors), 403 (delete disabled), 404 (not found), 409 (already analysing), 429 (usage limit), 502 (AI failure), 500 (other).
 
 ## 9. Folder map

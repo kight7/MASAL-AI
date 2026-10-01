@@ -183,7 +183,7 @@ export function ChatPanel({ lead, initialMessages }: { lead: Lead; initialMessag
               </div>
               {!(busy && m.id === messages[messages.length - 1]?.id) && (
                 <div className="mt-1">
-                  <CopyButton text={text} label="Copy" className="min-h-7 border-transparent px-1.5 text-[#5B6B80]" />
+                  <CopyButton text={text} label="Copy" className="border-transparent px-1.5 text-[#5B6B80]" />
                 </div>
               )}
             </div>
