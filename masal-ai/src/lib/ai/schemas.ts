@@ -129,3 +129,42 @@ export function tierFromScore(score: number): Tier {
   if (score >= 40) return "warm";
   return "cold";
 }
+
+/* ------------------------------------------------------------------ */
+/* Property match explanation (Prompt 5.1)                             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The AI explains properties that CODE already picked and scored (src/lib/matching.ts).
+ * It cannot add, remove, re-rank or re-score them; property ids are checked in code.
+ */
+export const MatchExplanationSchema = z.object({
+  pitch_order: z.string().min(1).describe('<= 30 words, e.g. "Pitch P-103 first because ...".'),
+  per_property: z.array(
+    z.object({
+      property_id: z.string().min(1),
+      why_it_fits: z.array(z.string()).describe("Max 2 talking points, each <= 14 words."),
+      watch_out: z.string().describe('One risk or gap to prepare for, <= 14 words, or "none".'),
+    })
+  ),
+  if_rejected: z.string().min(1).describe("<= 30 words: what to pitch next and how to frame it."),
+});
+
+export type MatchExplanation = z.infer<typeof MatchExplanationSchema>;
+
+/** What is stored in leads.match_explanation: the explanation plus which properties it covers. */
+export type StoredMatchExplanation = MatchExplanation & { property_ids: string[]; provider: "gemini" | "groq" };
+
+/** Throws (so the fallback provider runs) if the AI mentions a property it was not given. */
+export function normalizeMatchExplanation(e: MatchExplanation, allowedIds: string[]): MatchExplanation {
+  const allowed = new Set(allowedIds);
+  const unknown = e.per_property.map((p) => p.property_id).filter((id) => !allowed.has(id));
+  if (unknown.length) throw new Error(`AI referenced properties it was not given: ${unknown.join(", ")}`);
+  return {
+    ...e,
+    per_property: e.per_property.map((p) => ({
+      ...p,
+      why_it_fits: p.why_it_fits.map((w) => w.trim()).filter(Boolean).slice(0, 2),
+    })),
+  };
+}

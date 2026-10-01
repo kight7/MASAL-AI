@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CopyButton } from "@/components/copy-button";
+import { PropertyMatches } from "@/components/property-matches";
 import { CHANNEL_META } from "@/components/lead-card";
 import { ScoreBreakdown } from "@/components/score-breakdown";
 import { ScoreRing } from "@/components/score-ring";
@@ -205,6 +206,9 @@ export function AnalysisBrief({
               </div>
             </section>
           )}
+
+          {/* b2. Property Match & Cross-Sell Matrix (Prompt 5.1) */}
+          <PropertyMatches lead={lead} onLeadChange={onLeadChange} />
 
           {/* c. Summary and intent */}
           <section className="rounded-lg border bg-white p-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Clock, LoaderCircle, Mail, MapPin, MessageCircle, Phone, RotateCw, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreRing } from "@/components/score-ring";
 import { TierBadge, TIER_META, UrgentFlag } from "@/components/tier-badge";
 import { TIMELINE_LABELS, type Channel } from "@/lib/ai/schemas";
+import { matchProperties } from "@/lib/matching";
 import { isQueued, isStalePending, type Lead } from "@/lib/types";
 
 export const CHANNEL_META: Record<Channel, { label: string; icon: LucideIcon }> = {
@@ -61,6 +62,7 @@ export function LeadCard({
 
   const tierColor = lead.tier && lead.status === "analyzed" ? TIER_META[lead.tier].color : "#CBD3DD";
   const analysis = lead.status === "analyzed" ? lead.analysis : null;
+  const topMatch = useMemo(() => (analysis ? matchProperties(lead).matches[0] ?? null : null), [analysis, lead]);
   const channel = analysis ? CHANNEL_META[analysis.next_action.channel] : null;
   const ChannelIcon = channel?.icon;
 
@@ -144,6 +146,14 @@ export function LeadCard({
                   <ChannelIcon className="size-3.5" aria-hidden />
                   <span className="font-semibold">{channel.label}</span>
                   <span className="text-[#5B6B80]">{analysis.next_action.timeframe}</span>
+                </span>
+              )}
+              {topMatch && (
+                <span
+                  className="rounded-md bg-[#E6F4EC] px-1.5 py-0.5 font-medium text-[#1F6B45]"
+                  title={`${topMatch.property.project}, ${topMatch.property.locality}`}
+                >
+                  Top match {topMatch.confidence}%
                 </span>
               )}
             </div>

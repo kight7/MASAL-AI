@@ -1,4 +1,4 @@
-import type { Analysis, Tier, Timeline } from "@/lib/ai/schemas";
+import type { Analysis, StoredMatchExplanation, Tier, Timeline } from "@/lib/ai/schemas";
 
 export type { Analysis, Tier, Timeline };
 
@@ -24,6 +24,9 @@ export interface Lead {
   urgent: boolean;
   ai_provider: AIProvider | null;
   error: string | null;
+  /** Prompt 5.1: AI talking points for the code-picked property matches (null until requested). */
+  match_explanation: StoredMatchExplanation | null;
+  match_explained_at: string | null;
 }
 
 /** One row of the lead_messages table. */

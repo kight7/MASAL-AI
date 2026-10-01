@@ -1,0 +1,454 @@
+[
+  {
+    "id": "P-101",
+    "title": "3BHK, 14th floor, metro side",
+    "project": "Skyline Residency",
+    "locality": "Sector 62",
+    "city": "Noida",
+    "nearby": [
+      "Sector 63",
+      "Sector 61",
+      "Sector 71"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1420,
+    "price_inr": 14500000,
+    "status": "sold_out",
+    "possession": "ready",
+    "amenities": [
+      "metro",
+      "parking",
+      "high floor",
+      "power backup",
+      "gated"
+    ],
+    "highlight": "Five minutes' walk to Sector 62 metro, two covered parking slots."
+  },
+  {
+    "id": "P-102",
+    "title": "3BHK, 9th floor, corner unit",
+    "project": "Skyline Residency",
+    "locality": "Sector 62",
+    "city": "Noida",
+    "nearby": [
+      "Sector 63",
+      "Sector 61",
+      "Sector 71"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1510,
+    "price_inr": 16200000,
+    "status": "few_left",
+    "possession": "ready",
+    "amenities": [
+      "metro",
+      "parking",
+      "clubhouse",
+      "power backup",
+      "gated"
+    ],
+    "highlight": "Corner unit in the same tower block, larger balcony."
+  },
+  {
+    "id": "P-103",
+    "title": "3BHK, 11th floor",
+    "project": "Ivory Heights",
+    "locality": "Sector 63",
+    "city": "Noida",
+    "nearby": [
+      "Sector 62",
+      "Sector 61",
+      "Sector 64"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1380,
+    "price_inr": 13800000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "parking",
+      "high floor",
+      "gated",
+      "power backup"
+    ],
+    "highlight": "Two covered parking slots, 1.2 km from Sector 62 metro."
+  },
+  {
+    "id": "P-104",
+    "title": "2BHK + study, 7th floor",
+    "project": "Lotus Park",
+    "locality": "Sector 61",
+    "city": "Noida",
+    "nearby": [
+      "Sector 62",
+      "Sector 63",
+      "Sector 71"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1150,
+    "price_inr": 9800000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "metro",
+      "parking",
+      "gated",
+      "park"
+    ],
+    "highlight": "Study room can work as a third bedroom; one parking slot."
+  },
+  {
+    "id": "P-105",
+    "title": "3BHK with servant room",
+    "project": "Aravali Greens",
+    "locality": "Sector 65",
+    "city": "Gurugram",
+    "nearby": [
+      "Sector 66",
+      "Sector 67",
+      "Golf Course Extension Road"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1680,
+    "price_inr": 17200000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "school",
+      "pool",
+      "gym",
+      "parking"
+    ],
+    "highlight": "International school 1.5 km away, large clubhouse with pool."
+  },
+  {
+    "id": "P-106",
+    "title": "3BHK, 6th floor",
+    "project": "Emerald Court",
+    "locality": "Sector 67",
+    "city": "Gurugram",
+    "nearby": [
+      "Sector 65",
+      "Sector 66",
+      "Golf Course Extension Road"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1560,
+    "price_inr": 15500000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "school",
+      "parking"
+    ],
+    "highlight": "Gated society on Golf Course Extension Road, school 2 km away."
+  },
+  {
+    "id": "P-107",
+    "title": "3BHK, 10th floor",
+    "project": "Maple Woods",
+    "locality": "Sector 75",
+    "city": "Noida",
+    "nearby": [
+      "Sector 76",
+      "Sector 77",
+      "Sector 78"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1490,
+    "price_inr": 15200000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "school",
+      "metro",
+      "pool",
+      "parking"
+    ],
+    "highlight": "Two schools within 2 km, Sector 76 metro nearby."
+  },
+  {
+    "id": "P-108",
+    "title": "3BHK, 4th floor",
+    "project": "Silver Oak",
+    "locality": "Sector 76",
+    "city": "Noida",
+    "nearby": [
+      "Sector 75",
+      "Sector 77",
+      "Sector 78"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1400,
+    "price_inr": 13500000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "metro",
+      "parking"
+    ],
+    "highlight": "Next to Sector 76 metro, smaller clubhouse."
+  },
+  {
+    "id": "P-109",
+    "title": "2BHK, 9th floor",
+    "project": "Gaur Vista",
+    "locality": "Greater Noida West",
+    "city": "Greater Noida",
+    "nearby": [
+      "Noida Extension",
+      "Gaur City"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1050,
+    "price_inr": 7800000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "parking",
+      "power backup"
+    ],
+    "highlight": "The listing the customer mentioned; well-maintained society."
+  },
+  {
+    "id": "P-110",
+    "title": "2BHK, 5th floor",
+    "project": "Galaxy Nest",
+    "locality": "Greater Noida West",
+    "city": "Greater Noida",
+    "nearby": [
+      "Noida Extension",
+      "Gaur City"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 980,
+    "price_inr": 6800000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "gated",
+      "parking",
+      "power backup",
+      "park"
+    ],
+    "highlight": "Ready to move, maintenance about Rs 2.5 per sq ft."
+  },
+  {
+    "id": "P-111",
+    "title": "2BHK, 15th floor",
+    "project": "Nirvana Towers",
+    "locality": "Greater Noida West",
+    "city": "Greater Noida",
+    "nearby": [
+      "Noida Extension",
+      "Gaur City"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1010,
+    "price_inr": 6400000,
+    "status": "available",
+    "possession": "Dec 2027",
+    "amenities": [
+      "gated",
+      "clubhouse",
+      "pool",
+      "parking"
+    ],
+    "highlight": "Under construction, lower price, possession December 2027."
+  },
+  {
+    "id": "P-112",
+    "title": "3BHK, 8th floor",
+    "project": "Galaxy Nest",
+    "locality": "Greater Noida West",
+    "city": "Greater Noida",
+    "nearby": [
+      "Noida Extension",
+      "Gaur City"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1320,
+    "price_inr": 9200000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "gated",
+      "parking",
+      "power backup",
+      "park"
+    ],
+    "highlight": "Larger unit in the same society as P-110."
+  },
+  {
+    "id": "P-113",
+    "title": "2BHK, first floor",
+    "project": "Green Meadows",
+    "locality": "Sector 137",
+    "city": "Noida",
+    "nearby": [
+      "Sector 135",
+      "Sector 142",
+      "Sector 143"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1020,
+    "price_inr": 8800000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "lift",
+      "metro",
+      "first floor",
+      "park",
+      "parking"
+    ],
+    "highlight": "First-floor unit with lift, 400 m from Sector 137 metro."
+  },
+  {
+    "id": "P-114",
+    "title": "2BHK, 12th floor",
+    "project": "Green Meadows",
+    "locality": "Sector 137",
+    "city": "Noida",
+    "nearby": [
+      "Sector 135",
+      "Sector 142",
+      "Sector 143"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1060,
+    "price_inr": 9700000,
+    "status": "few_left",
+    "possession": "ready",
+    "amenities": [
+      "lift",
+      "metro",
+      "high floor",
+      "parking"
+    ],
+    "highlight": "Same society as P-113, higher floor with a view."
+  },
+  {
+    "id": "P-115",
+    "title": "2BHK, ground floor",
+    "project": "Palm Court",
+    "locality": "Sector 142",
+    "city": "Noida",
+    "nearby": [
+      "Sector 137",
+      "Sector 143",
+      "Sector 144"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 990,
+    "price_inr": 8200000,
+    "status": "available",
+    "possession": "Mar 2027",
+    "amenities": [
+      "lift",
+      "metro",
+      "ground floor",
+      "park"
+    ],
+    "highlight": "Ground floor with private lawn, possession March 2027."
+  },
+  {
+    "id": "P-116",
+    "title": "3BHK, sports-city tower",
+    "project": "Arena Heights",
+    "locality": "Sector 150",
+    "city": "Noida",
+    "nearby": [
+      "Sector 144",
+      "Sector 151",
+      "Sector 168"
+    ],
+    "type": "apartment",
+    "bhk": 3,
+    "carpet_sqft": 1580,
+    "price_inr": 18500000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "park",
+      "gym",
+      "pool"
+    ],
+    "highlight": "Low-density sector with large green areas."
+  },
+  {
+    "id": "P-117",
+    "title": "2BHK, 6th floor",
+    "project": "Arena Heights",
+    "locality": "Sector 150",
+    "city": "Noida",
+    "nearby": [
+      "Sector 144",
+      "Sector 151",
+      "Sector 168"
+    ],
+    "type": "apartment",
+    "bhk": 2,
+    "carpet_sqft": 1080,
+    "price_inr": 11000000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "clubhouse",
+      "gated",
+      "park"
+    ],
+    "highlight": "Entry-size unit in the same project as P-116."
+  },
+  {
+    "id": "P-118",
+    "title": "3BHK builder floor, 2nd floor",
+    "project": "Independent floor",
+    "locality": "Sector 66",
+    "city": "Gurugram",
+    "nearby": [
+      "Sector 65",
+      "Sector 67",
+      "Golf Course Extension Road"
+    ],
+    "type": "builder_floor",
+    "bhk": 3,
+    "carpet_sqft": 1450,
+    "price_inr": 14500000,
+    "status": "available",
+    "possession": "ready",
+    "amenities": [
+      "parking",
+      "park",
+      "power backup"
+    ],
+    "highlight": "Independent floor, no clubhouse, low maintenance."
+  }
+]

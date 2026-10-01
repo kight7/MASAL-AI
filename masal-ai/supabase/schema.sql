@@ -62,3 +62,7 @@ begin
   end if;
 end
 $$;
+
+-- Prompt 5.1 (Property Match): AI talking points for the code-picked matches.
+alter table leads add column if not exists match_explanation jsonb;
+alter table leads add column if not exists match_explained_at timestamptz;

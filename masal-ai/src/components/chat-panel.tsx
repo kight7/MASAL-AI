@@ -12,6 +12,7 @@ export const QUICK_PROMPTS = [
   "Make my reply more assertive",
   "Shorten my reply for WhatsApp",
   "How do I handle their main concern?",
+  "Which property should I pitch first?",
 ];
 
 const MAX_TEXT = 2000;

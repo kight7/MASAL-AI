@@ -8,8 +8,8 @@
 | 2.1 | Dashboard, intake form, ranked list | Done |
 | 2.2 | Lead detail: AI brief + grounded chat | Done |
 | 3.1 | Sample data, error states, polish | Done |
-| 4.1 | Pre-deploy audit + Vercel deploy | Partial (audit done; deploy is manual) |
-| 5.1 | Property Match & Cross-Sell Matrix | Not started |
+| 4.1 | Pre-deploy audit + Vercel deploy | Done |
+| 5.1 | Property Match & Cross-Sell Matrix | Done |
 | 5.2 | Call Prep Notes | Not started |
 | 6.1 | README, demo script, interview prep | Not started |
 
@@ -54,6 +54,11 @@
 | src/app/api/leads/seed/route.ts | POST: inserts the 6 sample leads as pending + queued, no AI call; 429 under the hourly cap |
 | src/components/sample-leads-button.tsx | Load sample leads: seed, then analyse one by one with progress toast; retry once after 5 s on 429/provider failure; skip on 409 |
 | src/app/loading.tsx, error.tsx, not-found.tsx | Skeleton while loading; friendly error page with Try again; "Lead not found" page |
+| src/data/inventory.json | 18 fictional Delhi NCR properties (incl. a sold-out exact fit for the hot sample lead) |
+| src/lib/matching.ts | Pure-code matcher: parseBudgetInr, parseBhk, matchProperties (confidence = budget 40 + location 30 + size 20 + features 10), formatInr |
+| src/app/api/leads/[id]/matches/route.ts | GET matches (code only); POST AI explanation of exactly those matches (cooldown 60 s) |
+| src/components/property-matches.tsx | Matrix: sold-out banner, 3 match cards with confidence and code reasons, AI talking points, pitch order, if-rejected, copy |
+| supabase/migration-5.sql | Adds match_explanation + match_explained_at to leads |
 | docs/DEPLOY.md | Click-by-click Vercel deploy (Root Directory = masal-ai), env var table, smoke test, troubleshooting |
 
 ## 3. Decisions
@@ -82,10 +87,11 @@
 - Sample leads are analysed from the browser one at a time (1.2 s gap) instead of in the seed route: no request can hit the 60 s limit and free-tier rate limits are respected. They are marked "queued" (error = "queued") so the re-analyse guard can claim each exactly once.
 - Pre-deploy audit (4.1): `next build` passes (9 routes; dashboard static, everything else dynamic); ESLint (eslint-config-next 16) clean; no "use client" file imports server modules; no secret names in .next/static; only NEXT_PUBLIC_SUPABASE_URL/ANON_KEY are public; every AI route exports maxDuration = 60; contact never reaches prompts; RLS + public SELECT on leads only; leads in supabase_realtime; FORCE_FALLBACK documented.
 - Lint fix: the dashboard's first load now sets state only inside a promise callback (react-hooks/set-state-in-effect).
+- 5.1 Property Match: code picks and scores properties; the AI only explains them (same principle as lead scoring). Unknown property ids in AI output fail validation and trigger the fallback. Matches are recomputed on the client from the lead (pure function + small JSON), so they stay in sync after re-analysis; the server route uses the same function. The chat is grounded in the same matches. Budget text like "1.4-1.5 Cr" or "80-95 lakh" is parsed in code; unclear budgets score neutral and say "confirm on call".
 - Accessibility pass: 40 px tap targets on mobile for icon and small buttons, visible focus rings, aria-labels on icon-only buttons, reduced-motion aware scrolling.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: deploy manually (docs/DEPLOY.md), run the smoke test, then Prompt 5.1
+NEXT: Prompt 5.2 - Call Prep Notes
