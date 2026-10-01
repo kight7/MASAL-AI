@@ -5,7 +5,7 @@
 |------|-------------|--------|
 | 1.1 | Contracts, database and AI layer | Done |
 | 1.2 | API routes | Done |
-| 2.1 | Dashboard, intake form, ranked list | Not started |
+| 2.1 | Dashboard, intake form, ranked list | Done |
 | 2.2 | Lead detail: AI brief + grounded chat | Not started |
 | 3.1 | Sample data, error states, polish | Not started |
 | 4.1 | Pre-deploy audit + Vercel deploy | Not started |
@@ -34,6 +34,15 @@
 | src/app/api/leads/[id]/messages/route.ts | GET chat history, oldest first |
 | src/app/api/leads/[id]/chat/route.ts | POST streaming chat (UI message stream), saves user + assistant messages, 429 after 30 user messages |
 | api.http | REST Client requests for every route, including error cases |
+| src/app/layout.tsx | App shell: sticky header (LeadLens wordmark + New lead), Toaster, metadata, IBM Plex Sans |
+| src/app/page.tsx | Dashboard: loading / error / empty states, stats filter, ranked list, highlight of a new lead |
+| src/hooks/use-leads.ts | Initial fetch + Supabase Realtime; every update is an upsert by id keeping the newest updated_at; LEAD_CREATED_EVENT |
+| src/components/intake-dialog.tsx | NewLeadButton + IntakeDialog: Zod validation, inline errors, 429 toast, no double submit |
+| src/components/lead-card.tsx | Scannable card (score ring, tier, urgent, summary, budget, timeline, next action); Retry for failed or stale; CHANNEL_META |
+| src/components/lead-list.tsx | Sections Needs attention / Hot / Warm / Cold; compareLeads() = urgent, score, newest; 15 s clock for staleness |
+| src/components/stats-bar.tsx | Hot / Warm / Cold / Urgent counts that act as toggle filters (aria-pressed) |
+| src/components/tier-badge.tsx | TIER_META colours + labels, TierBadge, UrgentFlag |
+| src/components/score-ring.tsx | SVG score ring in the tier colour; dashed ring when not scored |
 
 ## 3. Decisions
 - Installed versions checked (rule R5): ai 7.x, @ai-sdk/google 4.x, @ai-sdk/groq 4.x, zod 4.x, @supabase/supabase-js 2.x. In ai 7, generateObject is deprecated, so analysis uses generateText with output: Output.object({ schema }) and reads result.output. System prompts use `instructions` (the `system` option is deprecated).
@@ -50,9 +59,13 @@
 - Re-analysis is claimed with one conditional UPDATE (status != pending OR updated_at older than 90 s), so two clicks cannot start two analyses.
 - POST /api/leads returns 200 with status "failed" (not 502) when both AI providers fail, so the lead is never lost and the UI shows Retry.
 - Usage cap counts leads created in the last rolling hour across the app (rule R12).
+- UI: tier colours (hot #C8233C, warm #D98A00, cold #4A6A8A) are the only strong colours; navy #14213D for text and primary buttons. Every colour also has a text label.
+- The header's New lead button lives in the server layout, so the dialog announces a new lead with a window event (LEAD_CREATED_EVENT) instead of shared state; the dashboard listens, upserts and highlights it.
+- Timeline uses a native <select> (works well on phones and avoids depending on the shadcn Select API).
+- Cards use a stretched link so the whole card opens the lead while the Retry button stays clickable.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: Prompt 2.1 - Dashboard, intake form, ranked list
+NEXT: Prompt 2.2 - Lead detail: AI brief + grounded chat

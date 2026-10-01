@@ -1,69 +1,78 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { Inbox, RotateCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { NewLeadButton } from "@/components/intake-dialog";
+import { LeadList } from "@/components/lead-list";
+import { StatsBar, type LeadFilter } from "@/components/stats-bar";
+import { LEAD_CREATED_EVENT, useLeads } from "@/hooks/use-leads";
+import type { Lead } from "@/lib/types";
+
+export default function DashboardPage() {
+  const { leads, loading, error, refresh, addLead } = useLeads();
+  const [filter, setFilter] = useState<LeadFilter>("all");
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+
+  // Highlight a newly created lead for a few seconds and scroll it into view.
+  useEffect(() => {
+    const onCreated = (e: Event) => {
+      const lead = (e as CustomEvent<Lead>).detail;
+      setFilter("all");
+      setHighlightId(lead.id);
+      requestAnimationFrame(() =>
+        document.getElementById(`lead-${lead.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
+      );
+    };
+    window.addEventListener(LEAD_CREATED_EVENT, onCreated);
+    return () => window.removeEventListener(LEAD_CREATED_EVENT, onCreated);
+  }, []);
+
+  useEffect(() => {
+    if (!highlightId) return;
+    const t = setTimeout(() => setHighlightId(null), 4000);
+    return () => clearTimeout(t);
+  }, [highlightId]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8">
+      <div className="mb-5">
+        <h1 className="text-2xl font-bold tracking-tight text-[#14213D]">Your leads</h1>
+        <p className="mt-1 text-sm text-[#5B6B80]">Ranked by AI score, hottest first. Open a lead for the full brief and a coach.</p>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3" aria-busy="true" aria-label="Loading leads">
+          <Skeleton className="h-[52px] w-full" />
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border bg-white px-4 py-8 text-center">
+          <p className="text-sm text-[#14213D]">Leads could not be loaded: {error}</p>
+          <Button variant="outline" size="sm" className="mt-3" onClick={() => void refresh()}>
+            <RotateCw className="size-3.5" aria-hidden />
+            Try again
+          </Button>
+        </div>
+      ) : leads.length === 0 ? (
+        <div className="flex flex-col items-center rounded-lg border border-dashed bg-white px-4 py-14 text-center">
+          <Inbox className="size-8 text-[#9FB0C4]" aria-hidden />
+          <p className="mt-3 max-w-sm text-sm text-[#2D3B4E]">
+            No leads yet. Add an inquiry and the AI will score it, rank it and suggest what to do next.
           </p>
+          <div className="mt-4">
+            <NewLeadButton />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : (
+        <div className="space-y-6">
+          <StatsBar leads={leads} filter={filter} onFilterChange={setFilter} />
+          <LeadList leads={leads} filter={filter} highlightId={highlightId} onUpdated={addLead} />
         </div>
-      </main>
+      )}
     </div>
   );
 }
