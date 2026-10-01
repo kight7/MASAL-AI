@@ -6,8 +6,8 @@ Built for **IQOL Technologies** as a take-home assignment.
 
 | | |
 | --- | --- |
-| Live app | https://YOUR-PRODUCTION-DOMAIN.vercel.app |
-| Demo video (3 min) | YOUR-VIDEO-LINK |
+| Live app | https://masal-ai-u2f9.vercel.app/ |
+| Demo video (3 min) | https://drive.google.com/file/d/12Gi0nQzmmj0TvXWZJS1J11zbMr9bI_Kf/view?usp=drive_link |
 | Repository | https://github.com/kight7/MASAL-AI |
 
 ![Dashboard](masal-ai/docs/img/dashboard.png)
