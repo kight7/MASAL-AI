@@ -66,3 +66,7 @@ $$;
 -- Prompt 5.1 (Property Match): AI talking points for the code-picked matches.
 alter table leads add column if not exists match_explanation jsonb;
 alter table leads add column if not exists match_explained_at timestamptz;
+
+-- Prompt 5.2 (Call Prep Notes): the brief and which questions were ticked.
+alter table leads add column if not exists call_prep jsonb;
+alter table leads add column if not exists call_prep_at timestamptz;

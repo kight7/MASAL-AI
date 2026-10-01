@@ -168,3 +168,51 @@ export function normalizeMatchExplanation(e: MatchExplanation, allowedIds: strin
     })),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Call prep notes (Prompt 5.2)                                        */
+/* ------------------------------------------------------------------ */
+
+export const CallPrepSchema = z.object({
+  call_goal: z.string().min(1).describe("One sentence: what this call must achieve."),
+  opening_line: z.string().min(1).describe("<= 30 words, in the customer's language, ready to say."),
+  questions: z
+    .array(
+      z.object({
+        question: z.string().min(1).describe("<= 20 words, ready to ask."),
+        why: z.string().describe("<= 12 words: the gap this closes."),
+        priority: z.enum(["must_ask", "nice_to_ask"]),
+      })
+    )
+    .describe("4-6 questions, must_ask first."),
+  property_to_mention: z.object({
+    property_id: z.string().nullable().describe("An id from the property list, or null."),
+    how: z.string().describe("<= 25 words: how to bring it up, or why not to yet."),
+  }),
+  avoid: z.array(z.string()).describe("Max 3 things not to say or do, each <= 12 words."),
+  closing_ask: z.string().min(1).describe("<= 20 words: the commitment to ask for at the end."),
+});
+
+export type CallPrep = z.infer<typeof CallPrepSchema>;
+
+/** What is stored in leads.call_prep: the notes, which questions were ticked, and who wrote them. */
+export type StoredCallPrep = CallPrep & { asked: number[]; provider: "gemini" | "groq" };
+
+/** Must-ask first, max 6 questions, max 3 avoids. Throws on an unknown property id (-> fallback). */
+export function normalizeCallPrep(c: CallPrep, allowedPropertyIds: string[]): CallPrep {
+  const id = c.property_to_mention.property_id?.trim() || null;
+  if (id && !allowedPropertyIds.includes(id)) throw new Error(`AI referenced property ${id} that was not offered`);
+  const questions = [
+    ...c.questions.filter((q) => q.priority === "must_ask"),
+    ...c.questions.filter((q) => q.priority !== "must_ask"),
+  ]
+    .filter((q) => q.question.trim())
+    .slice(0, 6);
+  if (questions.length === 0) throw new Error("AI returned no questions");
+  return {
+    ...c,
+    questions,
+    property_to_mention: { ...c.property_to_mention, property_id: id },
+    avoid: c.avoid.map((a) => a.trim()).filter(Boolean).slice(0, 3),
+  };
+}

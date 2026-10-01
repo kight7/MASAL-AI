@@ -148,6 +148,9 @@ export function LeadCard({
                   <span className="text-[#5B6B80]">{analysis.next_action.timeframe}</span>
                 </span>
               )}
+              {lead.call_prep && (
+                <span className="rounded-md bg-[#14213D] px-1.5 py-0.5 font-medium text-white">Prepped</span>
+              )}
               {topMatch && (
                 <span
                   className="rounded-md bg-[#E6F4EC] px-1.5 py-0.5 font-medium text-[#1F6B45]"

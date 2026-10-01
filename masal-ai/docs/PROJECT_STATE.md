@@ -10,7 +10,7 @@
 | 3.1 | Sample data, error states, polish | Done |
 | 4.1 | Pre-deploy audit + Vercel deploy | Done |
 | 5.1 | Property Match & Cross-Sell Matrix | Done |
-| 5.2 | Call Prep Notes | Not started |
+| 5.2 | Call Prep Notes | Done |
 | 6.1 | README, demo script, interview prep | Not started |
 
 ## 2. File map
@@ -59,6 +59,9 @@
 | src/app/api/leads/[id]/matches/route.ts | GET matches (code only); POST AI explanation of exactly those matches (cooldown 60 s) |
 | src/components/property-matches.tsx | Matrix: sold-out banner, 3 match cards with confidence and code reasons, AI talking points, pitch order, if-rejected, copy |
 | supabase/migration-5.sql | Adds match_explanation + match_explained_at to leads |
+| src/app/api/leads/[id]/call-prep/route.ts | GET brief; POST generate (lead + analysis + matches + last 10 chat notes, cooldown 60 s); PATCH ticked questions |
+| src/components/call-prep-panel.tsx | useCallPrep hook + panel: goal, opening line, must-ask checklist (saved), property to mention, avoid, close, copy all |
+| supabase/migration-5-2.sql | Adds call_prep + call_prep_at to leads |
 | docs/DEPLOY.md | Click-by-click Vercel deploy (Root Directory = masal-ai), env var table, smoke test, troubleshooting |
 
 ## 3. Decisions
@@ -88,10 +91,11 @@
 - Pre-deploy audit (4.1): `next build` passes (9 routes; dashboard static, everything else dynamic); ESLint (eslint-config-next 16) clean; no "use client" file imports server modules; no secret names in .next/static; only NEXT_PUBLIC_SUPABASE_URL/ANON_KEY are public; every AI route exports maxDuration = 60; contact never reaches prompts; RLS + public SELECT on leads only; leads in supabase_realtime; FORCE_FALLBACK documented.
 - Lint fix: the dashboard's first load now sets state only inside a promise callback (react-hooks/set-state-in-effect).
 - 5.1 Property Match: code picks and scores properties; the AI only explains them (same principle as lead scoring). Unknown property ids in AI output fail validation and trigger the fallback. Matches are recomputed on the client from the lead (pure function + small JSON), so they stay in sync after re-analysis; the server route uses the same function. The chat is grounded in the same matches. Budget text like "1.4-1.5 Cr" or "80-95 lakh" is parsed in code; unclear budgets score neutral and say "confirm on call".
+- 5.2 Call Prep: questions target real gaps (not-stated fields, objections, flexibility when matches are weak or the top pick is sold out) and skip anything the salesperson already noted in the chat. The property to mention must be one of the code-picked matches (checked in code, else fallback). Ticks are saved with PATCH so the checklist survives a reload and shows what is still unknown after the call. The Next Action box has a "Prep for call" button: the brief starts from the AI's recommended next step.
 - Accessibility pass: 40 px tap targets on mobile for icon and small buttons, visible focus rings, aria-labels on icon-only buttons, reduced-motion aware scrolling.
 
 ## 4. Known issues
 - Model ids must be verified on the provider dashboards before use. The installed @ai-sdk/google already lists gemini-3.7-flash and gemini-3.8-flash; check which one your free key can call and set GEMINI_MODEL accordingly.
 - Live Gemini/Groq/Supabase calls are verified by the manual api.http steps (cannot be tested without your keys).
 
-NEXT: Prompt 5.2 - Call Prep Notes
+NEXT: Prompt 6.1 - README, demo script, interview prep

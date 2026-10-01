@@ -61,6 +61,8 @@ alter table lead_messages enable row level security;
 -- ALL writes go through server routes using the service-role key
 -- Prompt 5.1 (supabase/migration-5.sql): alter table leads add column if not exists match_explanation jsonb;
 --                                         alter table leads add column if not exists match_explained_at timestamptz;
+-- Prompt 5.2 (supabase/migration-5-2.sql): alter table leads add column if not exists call_prep jsonb;
+--                                           alter table leads add column if not exists call_prep_at timestamptz;
 
 ## 6. Data shapes
 LeadInput: name (string), location (string), property_requirement (string), budget (free text string), timeline (enum: immediately | within_1_month | 1_3_months | 3_6_months | 6_plus_months | just_exploring), message (string, max 4000), contact (optional string, max 100: phone or email).
@@ -78,6 +80,7 @@ AnalysisSchema (Zod):
 Property (src/data/inventory.json, 18 FICTIONAL properties; production would read the CRM or a table): id, title, project, locality, city, nearby[], type (apartment | villa | builder_floor | plot), bhk, carpet_sqft, price_inr, status (available | few_left | sold_out), possession ("ready" | month year), amenities[], highlight.
 MatchResult (src/lib/matching.ts, pure code): property, confidence 0-100 = budget 0-40 + location 0-30 + size 0-20 + features 0-10, label (best_fit | stretch | alternative), reasons[] (written by code). matchProperties() -> { matches (max 3, confidence >= 40, never sold out), soldOutTopPick }.
 MatchExplanationSchema (AI): pitch_order, per_property[{ property_id, why_it_fits[] (max 2), watch_out }], if_rejected. Stored with property_ids + provider. Any property_id not sent to the AI = failed attempt.
+CallPrepSchema (AI): call_goal, opening_line, questions[{ question, why, priority must_ask | nice_to_ask }] (4-6, must_ask first), property_to_mention { property_id | null, how }, avoid[] (max 3), closing_ask. Stored with asked: number[] (ticked questions) + provider. A property_id not in matchProperties() = failed attempt. Inputs: lead (no contact), analysis, matches, last 10 chat messages (salesperson notes).
 
 ## 7. Scoring and the analysis rubric
 score = sum of the four score_breakdown values (0-100), computed IN CODE, never by the model.
@@ -106,6 +109,9 @@ GET    /api/leads/[id]/messages   -> LeadMessage[] (oldest first)
 POST   /api/leads/[id]/chat       -> streamed reply grounded by buildChatSystem(lead); falls back to Groq if Gemini fails before the first token; persists user + assistant messages; 429 after 30 user messages on one lead. maxDuration 60.
 GET    /api/leads/[id]/matches    -> { matches, soldOutTopPick, explanation | null, explanationStale } computed in code, no AI call
 POST   /api/leads/[id]/matches    -> AI explains the code-picked matches and saves them; 409 if not analysed or no matches; 429 if explained < 60 s ago; 502 if both AI providers fail. maxDuration 60.
+GET    /api/leads/[id]/call-prep  -> { callPrep | null, asked, preparedAt }
+POST   /api/leads/[id]/call-prep  -> AI call brief; 409 if not analysed; 429 if prepared < 60 s ago; 502 if both providers fail. maxDuration 60.
+PATCH  /api/leads/[id]/call-prep  body { asked: number[] } -> saves ticked questions (no AI); 409 if no brief yet
 POST   /api/leads/seed            -> inserts 6 sample leads as status pending + queued and returns them (no AI call); the client analyses them one by one via reanalyze; 429 if fewer than 6 slots remain under MAX_LEADS_PER_HOUR
 Errors: JSON { error: string } with status 400 (validation, plus fieldErrors), 403 (delete disabled), 404 (not found), 409 (already analysing), 429 (usage limit), 502 (AI failure), 500 (other).
 
@@ -113,7 +119,7 @@ Errors: JSON { error: string } with status 400 (validation, plus fieldErrors), 4
 src/app/page.tsx                    dashboard
 src/app/leads/[id]/page.tsx         lead detail (AI brief + chat)
 src/app/api/...                     routes in section 8
-src/components/                     lead-card, lead-list, intake-dialog, analysis-brief, score-breakdown, chat-panel, copy-button, tier-badge, score-ring, stats-bar, lead-detail, sample-leads-button, property-matches
+src/components/                     lead-card, lead-list, intake-dialog, analysis-brief, score-breakdown, chat-panel, copy-button, tier-badge, score-ring, stats-bar, lead-detail, sample-leads-button, property-matches, call-prep-panel
 src/data/inventory.json             mock property inventory (fictional)
 src/lib/matching.ts                 parseBudgetInr, parseBhk, matchProperties, formatInr (pure code)
 src/hooks/use-leads.ts              fetch + Realtime subscription

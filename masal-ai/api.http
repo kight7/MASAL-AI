@@ -51,6 +51,15 @@ GET {{base}}/leads/{{leadId}}/matches
 ### 8c. Ask the AI to explain and compare those matches (429 if repeated within 60 s)
 POST {{base}}/leads/{{leadId}}/matches
 
+### 8d. Call prep: generate (429 if repeated within 60 s)
+POST {{base}}/leads/{{leadId}}/call-prep
+
+### 8e. Call prep: tick questions 0 and 2
+PATCH {{base}}/leads/{{leadId}}/call-prep
+Content-Type: application/json
+
+{ "asked": [0, 2] }
+
 ### --- Error cases ---
 
 ### 8. Validation error -> 400 with fieldErrors

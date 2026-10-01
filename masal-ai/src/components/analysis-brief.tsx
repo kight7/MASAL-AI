@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, ArrowLeft, LoaderCircle, Mail, Phone, RotateCw, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ClipboardList, LoaderCircle, Mail, Phone, RotateCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CallPrepPanel, useCallPrep } from "@/components/call-prep-panel";
 import { CopyButton } from "@/components/copy-button";
 import { PropertyMatches } from "@/components/property-matches";
 import { CHANNEL_META } from "@/components/lead-card";
@@ -53,6 +54,16 @@ export function AnalysisBrief({
   const [reanalyzing, setReanalyzing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const prepRef = useRef<HTMLElement>(null);
+  const callPrep = useCallPrep(lead, onLeadChange);
+
+  /** "Prep for call" in the Next Action box: jump to the panel and generate if there is no brief yet. */
+  function prepForCall() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    prepRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    if (!lead.call_prep) void callPrep.generate();
+  }
 
   const analysis = lead.status === "analyzed" ? lead.analysis : null;
   const stale = isStalePending(lead);
@@ -198,14 +209,36 @@ export function AnalysisBrief({
               <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white/12">
                 <ChannelIcon className="size-5" aria-hidden />
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-white/70">
                   Next: {channel.label}, {analysis.next_action.timeframe}
                 </p>
                 <p className="mt-0.5 text-lg font-semibold leading-snug">{analysis.next_action.action}</p>
+                <button
+                  type="button"
+                  onClick={prepForCall}
+                  disabled={callPrep.generating}
+                  className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-md bg-white px-3 text-sm font-semibold text-[#14213D] outline-none hover:bg-[#E6EBF1] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#14213D] disabled:opacity-70 sm:min-h-9"
+                >
+                  {callPrep.generating ? (
+                    <LoaderCircle className="size-4 animate-spin" aria-hidden />
+                  ) : (
+                    <ClipboardList className="size-4" aria-hidden />
+                  )}
+                  {callPrep.generating ? "Preparing your call…" : lead.call_prep ? "Open call prep" : "Prep for call"}
+                </button>
               </div>
             </section>
           )}
+
+          {/* b1. Call prep notes (Prompt 5.2) */}
+          <CallPrepPanel
+            ref={prepRef}
+            lead={lead}
+            onLeadChange={onLeadChange}
+            generating={callPrep.generating}
+            onGenerate={() => void callPrep.generate()}
+          />
 
           {/* b2. Property Match & Cross-Sell Matrix (Prompt 5.1) */}
           <PropertyMatches lead={lead} onLeadChange={onLeadChange} />
