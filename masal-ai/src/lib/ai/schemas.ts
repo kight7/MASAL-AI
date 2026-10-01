@@ -29,7 +29,7 @@ export const MESSAGE_MAX = 4000;
 export const CONTACT_MAX = 100;
 
 const requiredText = (label: string, max: number) =>
-  z.string().trim().min(1, `${label} is required`).max(max, `${label} is too long (max ${max} characters)`);
+  z.string({ error: `${label} is required` }).trim().min(1, `${label} is required`).max(max, `${label} is too long (max ${max} characters)`);
 
 export const LeadInputSchema = z.object({
   name: requiredText("Name", 120),

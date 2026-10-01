@@ -29,7 +29,7 @@ export interface AnalyzeResult {
  * - The score and tier are computed here in code from the four sub-scores (contract section 7).
  * Throws AIUnavailableError if both providers fail.
  */
-export async function analyzeLead(input: LeadInput): Promise<AnalyzeResult> {
+export async function analyzeLead(input: Omit<LeadInput, "contact">): Promise<AnalyzeResult> {
   const prompt = buildAnalysisPrompt({
     name: input.name,
     location: input.location,

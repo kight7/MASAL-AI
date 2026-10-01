@@ -1,0 +1,60 @@
+### LeadLens API - open in VS Code with the "REST Client" extension and click "Send Request".
+### Start the app first: npm run dev
+
+@base = http://localhost:3000/api
+
+### 1. Create a lead (inserted as pending, analysed, returned). Takes a few seconds.
+# @name createLead
+POST {{base}}/leads
+Content-Type: application/json
+
+{
+  "name": "Riya Sharma",
+  "location": "Sector 62, Noida",
+  "property_requirement": "3BHK apartment, high floor, near metro",
+  "budget": "1.4-1.5 Cr, home loan pre-approved",
+  "timeline": "within_1_month",
+  "message": "Hi, we saw a 3BHK in Sector 62 and also have an offer on another flat that expires Friday. Can we visit this weekend? Is there parking for 2 cars?",
+  "contact": "riya@example.com"
+}
+
+### The id of the lead created above (used by the requests below)
+@leadId = {{createLead.response.body.id}}
+
+### 2. List leads (score desc, newest first)
+GET {{base}}/leads
+
+### 3. Get one lead
+GET {{base}}/leads/{{leadId}}
+
+### 4. Chat about this lead (streams a reply grounded in the lead)
+POST {{base}}/leads/{{leadId}}/chat
+Content-Type: application/json
+
+{ "text": "What should I emphasize on the call?" }
+
+### 5. Chat history (oldest first) - should contain the question and the answer from step 4
+GET {{base}}/leads/{{leadId}}/messages
+
+### 6. Re-analyse. Send it twice quickly: the second one returns 409 (already analysing).
+POST {{base}}/leads/{{leadId}}/reanalyze
+
+### 7. Delete. Returns 403 unless ENABLE_DELETE=true in .env.local.
+DELETE {{base}}/leads/{{leadId}}
+
+### --- Error cases ---
+
+### 8. Validation error -> 400 with fieldErrors
+POST {{base}}/leads
+Content-Type: application/json
+
+{ "name": "", "timeline": "soon" }
+
+### 9. Unknown or malformed id -> 404
+GET {{base}}/leads/not-a-real-id
+
+### 10. Empty chat message -> 400
+POST {{base}}/leads/{{leadId}}/chat
+Content-Type: application/json
+
+{ "text": "   " }
