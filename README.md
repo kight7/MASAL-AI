@@ -269,15 +269,4 @@ masal-ai/
 - **The inventory is a fictional JSON file,** and location matching is by sector name, not distance.
 - **Free tiers have quotas.** When Gemini's daily quota runs out, every call falls back to Groq (shown as "Analysed by Groq (fallback)"). Free Supabase projects pause after about a week idle.
 
-**Next step I would build:** after the call, paste or record the transcript. The AI would update the lead, tick the call-prep questions that were answered, re-score it, and draft the follow-up.
-
 ---
-
-## AI usage disclosure
-
-| Tool | What I used it for |
-| --- | --- |
-| Claude (claude.ai) | Analysing the brief and planning the build in steps; reviewing and fixing my prompt guidebook (timeouts, fallback, scoring rubric, demo guards); generating the code for each step (data layer, API routes, dashboard, lead page, chat, sample data, both custom features); checking installed library versions; pre-deploy audit (build, lint, secrets); debugging setup issues (env variable names, Supabase schema mismatch, Next.js type generation, Vercel access and quota); writing this README and my interview notes |
-| ADD ANY OTHER TOOL | e.g. Copilot for autocomplete, ChatGPT for ... |
-
-I reviewed, ran and tested every step before committing, and I can explain every file in this repository.
